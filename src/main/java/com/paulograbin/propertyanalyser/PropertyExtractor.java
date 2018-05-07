@@ -9,9 +9,9 @@ import java.nio.file.Files;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Consumer;
-import java.util.stream.Stream;
 
 import static org.springframework.util.StringUtils.hasText;
+
 
 @Component
 public class PropertyExtractor {
@@ -28,9 +28,9 @@ public class PropertyExtractor {
         try {
             environmentName = getEnvironmentIdFromFileName(file.getName());
 
-            final Stream<String> lines = Files.lines(file.toPath());
+            var lines = Files.lines(file.toPath());
 
-            Consumer<String> c = new Consumer<String>() {
+            Consumer<String> c = new Consumer<>() {
                 @Override
                 public void accept(String line) {
                     if (hasText(line)) {
@@ -64,19 +64,18 @@ public class PropertyExtractor {
                 }
             };
 
-            lines.filter(l -> !lineIsCommentary(l)).forEach(c);
+            lines.filter(l -> !lineIsCommentary(l))
+                    .forEach(c);
+
         } catch (RuntimeException e) {
             System.out.println("Deu merda aqui...");
             e.printStackTrace();
-
         } catch (FileNotFoundException e) {
             e.printStackTrace();
-
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
-
 
     public Map<String, Property> getPropertiesDictionary() {
         return propertiesDictionary;
@@ -94,19 +93,19 @@ public class PropertyExtractor {
 
     private Property extractPropertyFromTextLine(String line) {
         line = line.trim();
-        final int i = findEqualSignPosition(line);
+        var i = findEqualSignPosition(line);
 
-        final String propertyName = extractPropertyName(line, i);
+        var propertyName = extractPropertyName(line, i);
 
-        String propertyValue = "";
+        var propertyValue = "";
         if (lineHasPropertyValue(line, i)) {
             propertyValue = extractPropertyValue(line, i);
         }
 
-        Property p = new Property(propertyName, environmentName, propertyValue);
-        p.addEnvironmentValue(environmentName, propertyValue);
+        var extractedProperty = new Property(propertyName, environmentName, propertyValue);
+        extractedProperty.addEnvironmentValue(environmentName, propertyValue);
 
-        return p;
+        return extractedProperty;
     }
 
     private String extractPropertyValue(String line, int i) {
@@ -122,7 +121,7 @@ public class PropertyExtractor {
     }
 
     private int findEqualSignPosition(String line) {
-        final int equalSignPosition = line.indexOf("=");
+        var equalSignPosition = line.indexOf("=");
 
         if(equalSignPosition == -1) {
             throw new RuntimeException("No equal sign found in line");
