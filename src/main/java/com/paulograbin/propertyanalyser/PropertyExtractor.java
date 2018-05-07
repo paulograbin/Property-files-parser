@@ -35,7 +35,7 @@ public class PropertyExtractor {
                 public void accept(String line) {
                     if (hasText(line)) {
                         try {
-                            final Property property = extractPropertyFromTextLine(line);
+                            var property = extractPropertyFromTextLine(line);
 
                             if (propertyAlreadyProcessed(property)) {
                                 appendNewValue(property);
@@ -58,7 +58,6 @@ public class PropertyExtractor {
                 private boolean propertyAlreadyProcessed(Property property) {
                     return propertiesDictionary.containsKey(property.getName());
                 }
-
 
                 private void addPropertyForTheFirstTime(Property property) {
                     propertiesDictionary.put(property.getName(), property);
