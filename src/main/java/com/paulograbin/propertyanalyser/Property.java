@@ -23,10 +23,6 @@ public class Property {
         return name;
     }
 
-    public String getEnvironmentName() {
-        return environmentName;
-    }
-
     public String getValue() {
         return value;
     }

@@ -24,10 +24,11 @@ public class EnvironmentLoader {
 
             for (File file : files) {
                 loadPropertiesFilesFromEnvironment(file);
+
             }
         }
 
-        if(directory.isFile()) {
+        if (shouldScanFile(directory)) {
             filesList.add(directory);
         }
     }
@@ -45,10 +46,7 @@ public class EnvironmentLoader {
              */
             @Override
             public boolean accept(File dir, String name) {
-                if(name.contains(".properties"))
-                    return true;
-
-                return false;
+                return name.contains(".properties");
             }
         }.accept(file.getParentFile(), file.getName());
     }
