@@ -1,14 +1,15 @@
 package com.paulograbin.propertyanalyser;
 
 import org.springframework.stereotype.Component;
+import org.springframework.util.StringUtils;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.Files;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.function.Consumer;
+import java.util.Collections;
+import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static org.springframework.util.StringUtils.hasText;
 
@@ -59,10 +60,21 @@ public class PropertyExtractor {
             propertyValue = extractPropertyValue(line, i);
         }
 
-        var extractedProperty = new Property(propertyName, environmentName, propertyValue);
+        var extractedProperty = new Property(propertyName, environmentName, propertyValue, line);
         extractedProperty.addEnvironmentValue(environmentName, propertyValue);
 
         return extractedProperty;
+    }
+
+
+    private String getEnvironmentIdFromFileName(String name) {
+        final String[] split = name.split("__");
+
+        return name;
+    }
+
+    private boolean lineIsCommentary(String line) {
+        return line.startsWith(COMMENT_CHARACTER);
     }
 
     private String extractPropertyValue(String line, int i) {
