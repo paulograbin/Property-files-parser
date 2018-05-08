@@ -24,7 +24,6 @@ public class EnvironmentLoader {
 
             for (File file : files) {
                 loadPropertiesFilesFromEnvironment(file);
-
             }
         }
 
