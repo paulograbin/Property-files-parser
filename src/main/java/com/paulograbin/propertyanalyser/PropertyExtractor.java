@@ -17,78 +17,35 @@ import static org.springframework.util.StringUtils.hasText;
 public class PropertyExtractor {
 
     private static final String COMMENT_CHARACTER = "#";
+    private static final int STRING_BEGIN_INDEX = 0;
 
     private String environmentName = "";
-    private Map<String, Property> propertiesDictionary = new HashMap<>();
 
-    public PropertyExtractor() {
+
+    public List<Property> processFile(File file) {
+        try {
+            return this.processFile(Files.lines(file.toPath()), file.getName());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return Collections.emptyList();
     }
 
-    public void processFile(File file) {
+    public List<Property> processFile(Stream<String> lines, String fileName) {
         try {
-            environmentName = getEnvironmentIdFromFileName(file.getName());
+            environmentName = getEnvironmentIdFromFileName(fileName);
 
-            var lines = Files.lines(file.toPath());
-
-            Consumer<String> c = new Consumer<>() {
-                @Override
-                public void accept(String line) {
-                    if (hasText(line)) {
-                        try {
-                            var property = extractPropertyFromTextLine(line);
-
-                            if (propertyAlreadyProcessed(property)) {
-                                appendNewValue(property);
-
-                            } else {
-                                addPropertyForTheFirstTime(property);
-                            }
-                        } catch (RuntimeException e) {
-                            System.err.println("Error trying to extract property from line " + line + ". Are you sure this is a property?");
-                        }
-                    }
-                }
-
-                private void appendNewValue(Property property) {
-                    final Property currentProp = propertiesDictionary.get(property.getName());
-
-                    currentProp.addEnvironmentValue(environmentName, property.getValue());
-                }
-
-                private boolean propertyAlreadyProcessed(Property property) {
-                    return propertiesDictionary.containsKey(property.getName());
-                }
-
-                private void addPropertyForTheFirstTime(Property property) {
-                    propertiesDictionary.put(property.getName(), property);
-                }
-            };
-
-            lines.filter(l -> !lineIsCommentary(l))
-                    .forEach(c);
+            return lines.filter(l -> !lineIsCommentary(l))
+                    .filter(StringUtils::hasText)
+                    .map(this::extractPropertyFromTextLine)
+                    .collect(Collectors.toList());
 
         } catch (RuntimeException e) {
             System.out.println("Deu merda aqui...");
             e.printStackTrace();
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
         }
-    }
 
-    public Map<String, Property> getPropertiesDictionary() {
-        return propertiesDictionary;
-    }
-
-    private String getEnvironmentIdFromFileName(String name) {
-        final String[] split = name.split("__");
-
-        return name;
-    }
-
-    private boolean lineIsCommentary(String line) {
-        return line.startsWith(COMMENT_CHARACTER);
+        return Collections.emptyList();
     }
 
     private Property extractPropertyFromTextLine(String line) {
@@ -116,8 +73,8 @@ public class PropertyExtractor {
         return hasText(extractPropertyValue(line, i));
     }
 
-    private String extractPropertyName(String line, int i) {
-        return line.substring(0, i);
+    private String extractPropertyName(String line, int equalSignIndex) {
+        return line.substring(STRING_BEGIN_INDEX, equalSignIndex);
     }
 
     private int findEqualSignPosition(String line) {
