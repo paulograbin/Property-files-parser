@@ -3,9 +3,7 @@ package com.paulograbin.propertyanalyser;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 import java.io.File;
-import java.util.Collection;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 
@@ -13,10 +11,11 @@ import java.util.Map;
 @SpringBootApplication
 public class PropertyanalyserApplication {
 
-    private PropertyExtractor propertyExtractor = new PropertyExtractor();
-    private EnvironmentLoader environmentLoader = new EnvironmentLoader();
+    private final PropertyExtractor propertyExtractor = new PropertyExtractor();
+    private final EnvironmentLoader environmentLoader = new EnvironmentLoader();
 
     private Map<String, Property> propertiesDictionary = new HashMap<>();
+    private int environmentCount = 0;
 
 
     public static void main(String[] args) {
@@ -29,22 +28,35 @@ public class PropertyanalyserApplication {
         p.init(args[0]);
     }
 
-    public void init(String path) {
-        int environmentCount = 0;
-
+    private void init(String path) {
         environmentLoader.loadPropertiesFilesFromEnvironment(new File(path));
 
-        final List<File> filesList = environmentLoader.getFilesList();
+        var propertyFilesFound = environmentLoader.getFilesList();
 
-        for (File file : filesList) {
+        for (var file : propertyFilesFound) {
             System.out.println("Reading properties from file: " + file.getName() + " " + file.getParent());
-            final List<Property> properties = propertyExtractor.processFile(file);
+            var extractedPropertiesFromEnvironment = propertyExtractor.processFile(file);
 
-            properties.stream().forEach(this::addToDictionary);
+            extractedPropertiesFromEnvironment.stream().forEach(this::addToDictionary);
 
             environmentCount++;
         }
 
+        logInformation();
+
+
+        var allPropertiesFound = propertiesDictionary.values();
+
+        var finalEnvironmentCount = environmentCount;
+        allPropertiesFound.forEach(p -> {
+            if(p.getValuePerEnvironment().values().size() == finalEnvironmentCount) {
+                System.out.println("Property " + p.getName() + " is present in all environments with the same value");
+                System.out.println(p.getName());
+            }
+        });
+    }
+
+    private void logInformation() {
         System.out.println(environmentCount + " environments scanned");
         System.out.println(propertiesDictionary.keySet().size() + " properties found");
         System.out.println(propertiesDictionary.values()
@@ -53,17 +65,6 @@ public class PropertyanalyserApplication {
                         .keySet()
                         .size())
                 .sum() + " values found"); // TODO make this less awful to the eyes
-
-
-        final Collection<Property> values = propertiesDictionary.values();
-
-        int finalEnvironmentCount = environmentCount;
-        values.forEach(p -> {
-            if(p.getValuePerEnvironment().values().size() == finalEnvironmentCount) {
-                System.out.println("Property " + p.getName() + " is present in all envs with the same value");
-                System.out.println(p.getName());
-            }
-        });
     }
 
     private void addToDictionary(Property property) {
@@ -79,9 +80,9 @@ public class PropertyanalyserApplication {
     }
 
     private void appendNewValue(Property property) {
-        final Property currentProp = propertiesDictionary.get(property.getName());
+        var currentProperty = propertiesDictionary.get(property.getName());
 
-        currentProp.addEnvironmentValue(property.getEnvironmentName(), property.getValue());
+        currentProperty.addEnvironmentValue(property.getEnvironmentName(), property.getValue());
     }
 
     private boolean propertyAlreadyProcessed(Property property) {
