@@ -50,13 +50,13 @@ public class PropertyExtractor {
 
     private Property extractPropertyFromTextLine(String line) {
         line = line.trim();
-        var i = findEqualSignPosition(line);
+        var equalSignPosition = findEqualSignPosition(line);
 
-        var propertyName = extractPropertyName(line, i);
+        var propertyName = extractPropertyName(line, equalSignPosition);
 
         var propertyValue = "";
-        if (lineHasPropertyValue(line, i)) {
-            propertyValue = extractPropertyValue(line, i);
+        if (lineHasPropertyValue(line, equalSignPosition)) {
+            propertyValue = extractPropertyValue(line, equalSignPosition);
         }
 
         var extractedProperty = new Property(propertyName, environmentName, propertyValue, line);
