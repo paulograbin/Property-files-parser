@@ -1,16 +1,40 @@
 package com.paulograbin.propertyanalyser;
 
-import org.junit.jupiter.api.BeforeEach;
+import org.junit.Before;
+import org.junit.Test;
 
-import static org.junit.jupiter.api.Assertions.*;
+import java.util.List;
+import java.util.stream.Stream;
 
-class PropertyExtractorTest {
+import static org.junit.Assert.assertEquals;
 
-    PropertyExtractor propertyExtractor;
 
-    @BeforeEach
-    void setUp() {
+public class PropertyExtractorTest {
+
+    private PropertyExtractor propertyExtractor;
+
+    @Before
+    public void setUp() {
         propertyExtractor = new PropertyExtractor();
-//        propertyExtractor.processFile();
+    }
+
+    @Test
+    public void basicTest() {
+        var properties = propertyExtractor.processFile(makeStreamOfStrings(), "file_1");
+
+        assertEquals(4, properties.size());
+    }
+
+    @Test
+    public void lineWithoutEqualSignShouldNotBeProperty() {
+        final Stream<String> a = Stream.of("a=a", "b=b", "c=c", "a");
+
+        final List<Property> teste = propertyExtractor.processFile(a, "teste");
+
+        assertEquals(4, teste.size());
+    }
+
+    private Stream<String> makeStreamOfStrings() {
+        return Stream.of("a=a", "b=b", "c=c", "a=adas");
     }
 }

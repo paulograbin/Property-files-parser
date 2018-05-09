@@ -3,9 +3,11 @@ package com.paulograbin.propertyanalyser;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
 import java.util.HashMap;
 import java.util.Map;
-
+import java.util.stream.Stream;
 
 
 @SpringBootApplication
@@ -35,15 +37,21 @@ public class PropertyanalyserApplication {
 
         for (var file : propertyFilesFound) {
             System.out.println("Reading properties from file: " + file.getName() + " " + file.getParent());
-            var extractedPropertiesFromEnvironment = propertyExtractor.processFile(file);
 
-            extractedPropertiesFromEnvironment.stream().forEach(this::addToDictionary);
+            final Stream<String> lines;
+            try {
+                lines = Files.lines(file.toPath());
+                var extractedPropertiesFromEnvironment = propertyExtractor.processFile(lines, file.getName());
 
-            environmentCount++;
+                extractedPropertiesFromEnvironment.stream().forEach(this::addToDictionary);
+
+                environmentCount++;
+            } catch (IOException e) {
+                System.err.println("Problems while parsing file " + file.getName());
+            }
         }
 
         logInformation();
-
 
         var allPropertiesFound = propertiesDictionary.values();
 

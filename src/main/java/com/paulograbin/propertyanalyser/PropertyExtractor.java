@@ -3,10 +3,6 @@ package com.paulograbin.propertyanalyser;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
-import java.io.File;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -23,44 +19,35 @@ public class PropertyExtractor {
     private String environmentName = "";
 
 
-    public List<Property> processFile(File file) {
-        try {
-            return this.processFile(Files.lines(file.toPath()), file.getName());
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return Collections.emptyList();
-    }
-
     public List<Property> processFile(Stream<String> lines, String fileName) {
-        try {
             environmentName = getEnvironmentIdFromFileName(fileName);
 
             return lines.filter(l -> !lineIsCommentary(l))
                     .filter(StringUtils::hasText)
                     .map(this::extractPropertyFromTextLine)
                     .collect(Collectors.toList());
-
-        } catch (RuntimeException e) {
-            System.out.println("Deu merda aqui...");
-        }
-
-        return Collections.emptyList();
     }
 
     private Property extractPropertyFromTextLine(String line) {
         line = line.trim();
-        var equalSignPosition = findEqualSignPosition(line);
 
-        var propertyName = extractPropertyName(line, equalSignPosition);
+        Property extractedProperty = null;
 
-        var propertyValue = "";
-        if (lineHasPropertyValue(line, equalSignPosition)) {
-            propertyValue = extractPropertyValue(line, equalSignPosition);
+        try {
+            var equalSignPosition = findEqualSignPosition(line);
+
+            var propertyName = extractPropertyName(line, equalSignPosition);
+
+            var propertyValue = "";
+            if (lineHasPropertyValue(line, equalSignPosition)) {
+                propertyValue = extractPropertyValue(line, equalSignPosition);
+            }
+
+            extractedProperty = new Property(propertyName, environmentName, propertyValue, line);
+            extractedProperty.addEnvironmentValue(environmentName, propertyValue);
+        } catch (RuntimeException e) {
+            System.out.println(e.getMessage());
         }
-
-        var extractedProperty = new Property(propertyName, environmentName, propertyValue, line);
-        extractedProperty.addEnvironmentValue(environmentName, propertyValue);
 
         return extractedProperty;
     }
@@ -92,7 +79,7 @@ public class PropertyExtractor {
         var equalSignPosition = line.indexOf("=");
 
         if(equalSignPosition == -1) {
-            throw new RuntimeException("No equal sign found in line");
+            throw new RuntimeException("No equal sign found in line: " + line);
         }
 
         return equalSignPosition;
