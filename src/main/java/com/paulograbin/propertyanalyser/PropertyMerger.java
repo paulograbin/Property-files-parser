@@ -12,14 +12,10 @@ public class PropertyMerger {
         dictionary = propertiesDictionary;
 
         extractedPropertiesFromEnvironment.forEach(p -> {
-            try {
-                if (propertyAlreadyProcessed(p)) {
-                    appendNewValue(p);
-                } else {
-                    addPropertyForTheFirstTime(p);
-                }
-            } catch (RuntimeException e) {
-                System.err.println("Error trying to extract property from line " + p.getOriginalLine() + ". Are you sure this is a property?");
+            if (propertyAlreadyProcessed(p)) {
+                appendNewValue(p);
+            } else {
+                addPropertyForTheFirstTime(p);
             }
         });
     }
