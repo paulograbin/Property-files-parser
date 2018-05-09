@@ -4,13 +4,13 @@ import java.util.HashMap;
 import java.util.Map;
 
 
-public class Property {
+class Property {
 
-    private String name;
-    private String environmentName;
-    private String value;
-    private String originalLine;
-    private Map<String, String> valuePerEnvironment;
+    private final String name;
+    private final String environmentName;
+    private final String value;
+    private final String originalLine;
+    private final Map<String, String> valuePerEnvironment;
 
     public Property(String name, String environmentName, String value, String originalLine) {
         this.name = name;
@@ -41,16 +41,8 @@ public class Property {
         return environmentName;
     }
 
-    public void setEnvironmentName(String environmentName) {
-        this.environmentName = environmentName;
-    }
-
     public String getOriginalLine() {
         return originalLine;
-    }
-
-    public void setOriginalLine(String originalLine) {
-        this.originalLine = originalLine;
     }
 
     @Override
