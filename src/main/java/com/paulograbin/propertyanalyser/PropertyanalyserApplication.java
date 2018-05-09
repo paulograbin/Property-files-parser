@@ -28,14 +28,20 @@ public class PropertyanalyserApplication {
         }
 
         PropertyanalyserApplication p = new PropertyanalyserApplication();
-        p.init(args[0]);
+        p.runAnalysis(args[0]);
     }
 
-    private void init(String path) {
+    private void runAnalysis(String path) {
         environmentLoader.loadPropertiesFilesFromEnvironment(new File(path));
 
         var propertyFilesFound = environmentLoader.getFilesList();
 
+        computePropertiesInEnvironment(propertyFilesFound);
+        logInformation();
+        printResults();
+    }
+
+    private void computePropertiesInEnvironment(List<File> propertyFilesFound) {
         for (var file : propertyFilesFound) {
             System.out.println("Reading properties from file: " + file.getName() + " " + file.getParent());
 
@@ -50,9 +56,6 @@ public class PropertyanalyserApplication {
                 System.err.println("Problems while parsing file " + file.getName());
             }
         }
-
-        logInformation();
-        printResults();
     }
 
     private void printResults() {
