@@ -10,6 +10,7 @@ class Property {
     private final String environmentName;
     private final String value;
     private final String originalLine;
+
     private final Map<String, String> valuePerEnvironment;
 
     public Property(String name, String environmentName, String value, String originalLine) {

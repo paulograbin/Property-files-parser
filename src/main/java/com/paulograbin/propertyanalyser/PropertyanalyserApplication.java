@@ -6,8 +6,8 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
-import java.util.stream.Stream;
 
 
 @SpringBootApplication
@@ -15,6 +15,7 @@ public class PropertyanalyserApplication {
 
     private final PropertyExtractor propertyExtractor = new PropertyExtractor();
     private final EnvironmentLoader environmentLoader = new EnvironmentLoader();
+    private final PropertyMerger propertyMerger = new PropertyMerger();
 
     private Map<String, Property> propertiesDictionary = new HashMap<>();
     private int environmentCount = 0;
@@ -38,12 +39,11 @@ public class PropertyanalyserApplication {
         for (var file : propertyFilesFound) {
             System.out.println("Reading properties from file: " + file.getName() + " " + file.getParent());
 
-            final Stream<String> lines;
             try {
-                lines = Files.lines(file.toPath());
+                var lines = Files.lines(file.toPath());
                 var extractedPropertiesFromEnvironment = propertyExtractor.processFile(lines, file.getName());
 
-                extractedPropertiesFromEnvironment.stream().forEach(this::addToDictionary);
+                combineCurrentPropertiesWithResult(extractedPropertiesFromEnvironment);
 
                 environmentCount++;
             } catch (IOException e) {
@@ -64,6 +64,10 @@ public class PropertyanalyserApplication {
         });
     }
 
+    private void combineCurrentPropertiesWithResult(List<Property> extractedPropertiesFromEnvironment) {
+        propertyMerger.addToDictionary(propertiesDictionary, extractedPropertiesFromEnvironment.stream());
+    }
+
     private void logInformation() {
         System.out.println(environmentCount + " environments scanned");
         System.out.println(propertiesDictionary.keySet().size() + " properties found");
@@ -73,31 +77,5 @@ public class PropertyanalyserApplication {
                         .keySet()
                         .size())
                 .sum() + " values found"); // TODO make this less awful to the eyes
-    }
-
-    private void addToDictionary(Property property) {
-        try {
-            if (propertyAlreadyProcessed(property)) {
-                appendNewValue(property);
-            } else {
-                addPropertyForTheFirstTime(property);
-            }
-        } catch (RuntimeException e) {
-            System.err.println("Error trying to extract property from line " + property.getOriginalLine() + ". Are you sure this is a property?");
-        }
-    }
-
-    private void appendNewValue(Property property) {
-        var currentProperty = propertiesDictionary.get(property.getName());
-
-        currentProperty.addEnvironmentValue(property.getEnvironmentName(), property.getValue());
-    }
-
-    private boolean propertyAlreadyProcessed(Property property) {
-        return propertiesDictionary.containsKey(property.getName());
-    }
-
-    private void addPropertyForTheFirstTime(Property property) {
-        propertiesDictionary.put(property.getName(), property);
     }
 }
