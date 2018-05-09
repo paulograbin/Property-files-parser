@@ -43,7 +43,6 @@ public class PropertyExtractor {
 
         } catch (RuntimeException e) {
             System.out.println("Deu merda aqui...");
-            e.printStackTrace();
         }
 
         return Collections.emptyList();
