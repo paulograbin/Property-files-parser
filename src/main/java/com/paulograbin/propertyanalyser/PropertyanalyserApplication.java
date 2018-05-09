@@ -52,7 +52,10 @@ public class PropertyanalyserApplication {
         }
 
         logInformation();
+        printResults();
+    }
 
+    private void printResults() {
         var allPropertiesFound = propertiesDictionary.values();
 
         var finalEnvironmentCount = environmentCount;
