@@ -12,7 +12,7 @@ import java.util.List;
 @Component
 public class EnvironmentLoader {
 
-    private List<File> filesList = new ArrayList<>();
+    private final List<File> filesList = new ArrayList<>();
 
     public URL loadContext() {
         return this.getClass().getResource("/environments");
@@ -50,7 +50,7 @@ public class EnvironmentLoader {
         }.accept(file.getParentFile(), file.getName());
     }
 
-    public List<File> getFilesList() {
+    List<File> getFilesList() {
         return filesList;
     }
 }

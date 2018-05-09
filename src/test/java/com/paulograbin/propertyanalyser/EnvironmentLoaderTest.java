@@ -11,7 +11,7 @@ import java.util.List;
 
 class EnvironmentLoaderTest {
 
-    EnvironmentLoader environmentLoader;
+    private EnvironmentLoader environmentLoader;
 
     @BeforeEach
     void setUp() {
