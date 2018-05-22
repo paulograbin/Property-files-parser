@@ -1,6 +1,5 @@
 package com.paulograbin.propertyanalyser;
 
-import org.junit.Assert;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -8,6 +7,8 @@ import java.io.File;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.List;
+
+import static org.junit.Assert.assertEquals;
 
 class EnvironmentLoaderTest {
 
@@ -25,7 +26,7 @@ class EnvironmentLoaderTest {
         environmentLoader.loadPropertiesFilesFromEnvironment(environmentLocation);
         final List<File> filesList = environmentLoader.getFilesList();
 
-        Assert.assertEquals(3, filesList.size());
+        assertEquals(3, filesList.size());
     }
 
     private File makeResourcesURL() throws URISyntaxException {

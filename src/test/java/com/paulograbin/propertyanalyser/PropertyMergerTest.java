@@ -5,8 +5,9 @@ import org.junit.Test;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.stream.Stream;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 public class PropertyMergerTest {
 
@@ -20,7 +21,21 @@ public class PropertyMergerTest {
     }
 
     @Test
-    public void name() {
-//        merger.addToDictionary();
+    public void multipleCallsWithSameParametersMustNotModify() {
+        merger.addToDictionary(dictionary, makeStream());
+        assertEquals(4, dictionary.size());
+
+
+        merger.addToDictionary(dictionary, makeStream());
+        assertEquals(4, dictionary.size());
+    }
+
+    public Stream<Property> makeStream() {
+        Property a = new Property("a", "10", "a", "a=a");
+        Property b = new Property("b", "10", "b", "b=b");
+        Property c = new Property("c", "10", "c", "c=c");
+        Property d = new Property("d", "10", "d", "d=d");
+
+        return Stream.of(a, b,c ,d);
     }
 }

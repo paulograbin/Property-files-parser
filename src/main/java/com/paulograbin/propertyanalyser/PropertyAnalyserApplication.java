@@ -1,7 +1,5 @@
 package com.paulograbin.propertyanalyser;
 
-import org.springframework.boot.autoconfigure.SpringBootApplication;
-
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -10,15 +8,23 @@ import java.util.List;
 import java.util.Map;
 
 
-@SpringBootApplication
-public class PropertyanalyserApplication {
+public class PropertyAnalyserApplication {
 
-    private final PropertyExtractor propertyExtractor = new PropertyExtractor();
-    private final EnvironmentLoader environmentLoader = new EnvironmentLoader();
-    private final PropertyMerger propertyMerger = new PropertyMerger();
+    private final PropertyExtractor propertyExtractor;
+    private final EnvironmentLoader environmentLoader;
+    private final PropertyMerger propertyMerger;
 
-    private Map<String, Property> propertiesDictionary = new HashMap<>();
+    private Map<String, Property> propertiesDictionary;
     private int environmentCount = 0;
+
+
+    public PropertyAnalyserApplication() {
+        this.propertiesDictionary = new HashMap<>();
+
+        this.propertyExtractor = new PropertyExtractor();
+        this.environmentLoader = new EnvironmentLoader();
+        this.propertyMerger = new PropertyMerger();
+    }
 
 
     public static void main(String[] args) {
@@ -27,11 +33,11 @@ public class PropertyanalyserApplication {
             System.exit(1);
         }
 
-        PropertyanalyserApplication p = new PropertyanalyserApplication();
-        p.runAnalysis(args[0]);
+        PropertyAnalyserApplication p = new PropertyAnalyserApplication();
+        final AnalysisResult analysisResult = p.runAnalysis(args[0]);
     }
 
-    private void runAnalysis(String path) {
+    public AnalysisResult runAnalysis(String path) {
         environmentLoader.loadPropertiesFilesFromEnvironment(new File(path));
 
         var propertyFilesFound = environmentLoader.getFilesList();
@@ -39,11 +45,13 @@ public class PropertyanalyserApplication {
         computePropertiesInEnvironment(propertyFilesFound);
         logInformation();
         printResults();
+
+        return null;
     }
 
     private void computePropertiesInEnvironment(List<File> propertyFilesFound) {
         for (var file : propertyFilesFound) {
-            System.out.println("Reading properties from file: " + file.getName() + " " + file.getParent());
+            System.out.println("Reading properties from file: " + file.getPath());
 
             try {
                 var lines = Files.lines(file.toPath());

@@ -22,10 +22,10 @@ public class PropertyExtractor {
     public List<Property> processFile(Stream<String> lines, String fileName) {
             environmentName = getEnvironmentIdFromFileName(fileName);
 
-            return lines.filter(l -> !lineIsCommentary(l))
-                    .filter(StringUtils::hasText)
-                    .map(this::extractPropertyFromTextLine)
-                    .collect(Collectors.toList());
+        return lines.filter(l -> !lineIsCommentary(l))
+                .filter(StringUtils::hasText)
+                .map(this::extractPropertyFromTextLine)
+                .collect(Collectors.toUnmodifiableList());
     }
 
     private Property extractPropertyFromTextLine(String line) {
