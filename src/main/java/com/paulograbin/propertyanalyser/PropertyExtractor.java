@@ -50,10 +50,7 @@ public class PropertyExtractor {
         return extractedProperty;
     }
 
-
     private String getEnvironmentIdFromFileName(String name) {
-        final String[] split = name.split("__");
-
         return name;
     }
 
