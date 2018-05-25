@@ -17,19 +17,22 @@ public class PropertyExtractor {
     private String environmentName = "";
 
 
-    public List<Property> processFile(Stream<String> lines, String fileName) {
-            environmentName = getEnvironmentIdFromFileName(fileName);
+    public List<Property> processFile(final Stream<String> lines, final String fileName) {
+        environmentName = getEnvironmentIdFromFileName(fileName);
 
-        return lines.filter(l -> !lineIsCommentary(l))
-                .filter(StringUtils::hasText)
+        return lines.filter(this::isValidProperty)
                 .map(this::extractPropertyFromTextLine)
                 .collect(Collectors.toUnmodifiableList());
+    }
+
+    private boolean isValidProperty(String s) {
+        return !lineIsCommentary(s) && StringUtils.hasText(s) && findEqualSignPosition(s) > 0;
     }
 
     private Property extractPropertyFromTextLine(String line) {
         line = line.trim();
 
-        Property extractedProperty = null;
+        Property extractedProperty = new Property("", "", "", "");
 
         try {
             var equalSignPosition = findEqualSignPosition(line);
@@ -71,12 +74,6 @@ public class PropertyExtractor {
     }
 
     private int findEqualSignPosition(String line) {
-        var equalSignPosition = line.indexOf("=");
-
-        if(equalSignPosition == -1) {
-            throw new RuntimeException("No equal sign found in line: " + line);
-        }
-
-        return equalSignPosition;
+        return line.indexOf("=");
     }
 }
