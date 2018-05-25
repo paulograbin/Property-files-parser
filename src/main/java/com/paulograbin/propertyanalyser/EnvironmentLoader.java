@@ -1,7 +1,5 @@
 package com.paulograbin.propertyanalyser;
 
-import org.springframework.stereotype.Component;
-
 import java.io.File;
 import java.io.FilenameFilter;
 import java.net.URL;
@@ -9,7 +7,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 
-@Component
 public class EnvironmentLoader {
 
     private final List<File> filesList = new ArrayList<>();

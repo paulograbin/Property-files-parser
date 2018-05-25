@@ -1,6 +1,5 @@
 package com.paulograbin.propertyanalyser;
 
-import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
 import java.util.List;
@@ -10,7 +9,6 @@ import java.util.stream.Stream;
 import static org.springframework.util.StringUtils.hasText;
 
 
-@Component
 public class PropertyExtractor {
 
     private static final String COMMENT_CHARACTER = "#";
