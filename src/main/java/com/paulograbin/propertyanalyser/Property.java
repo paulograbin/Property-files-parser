@@ -42,16 +42,14 @@ class Property {
         return environmentName;
     }
 
-    public String getOriginalLine() {
-        return originalLine;
-    }
-
     @Override
     public String toString() {
         return "Property{" +
                 "name='" + name + '\'' +
                 ", environmentName='" + environmentName + '\'' +
                 ", value='" + value + '\'' +
+                ", originalLine='" + originalLine + '\'' +
+                ", valuePerEnvironment=" + valuePerEnvironment +
                 '}';
     }
 }
